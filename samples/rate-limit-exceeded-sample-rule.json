@@ -1,0 +1,41 @@
+{
+  "Name": "rate-limit-exceeded",
+  "Priority": 11,
+  "Statement": {
+    "RateBasedStatement": {
+      "Limit": 10,
+      "EvaluationWindowSec": 60,
+      "AggregateKeyType": "CUSTOM_KEYS",
+      "CustomKeys": [
+        {
+          "Header": {
+            "Name": "Authorization",
+            "TextTransformations": [
+              {
+                "Priority": 0,
+                "Type": "NONE"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "Action": {
+    "Count": {
+      "CustomRequestHandling": {
+        "InsertHeaders": [
+          {
+            "Name": "rate-exceeded",
+            "Value": "10"
+          }
+        ]
+      }
+    }
+  },
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "rate-limit-exceeded"
+  }
+}

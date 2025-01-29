@@ -1,0 +1,75 @@
+{
+  "Name": "medium-confidence-bot-signals",
+  "Priority": 9,
+  "Statement": {
+    "OrStatement": {
+      "Statements": [
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:coordinated_activity:medium"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:ip:medium"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:country:medium"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:asn:medium"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:high"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:signal:automated_browser"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:signal:browser_automation_extension"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:awswaf:managed:aws:bot-control:targeted:signal:browser_inconsistency"
+          }
+        }
+      ]
+    }
+  },
+  "Action": {
+    "Count": {
+      "CustomRequestHandling": {
+        "InsertHeaders": [
+          {
+            "Name": "bot-confidence",
+            "Value": "medium"
+          }
+        ]
+      }
+    }
+  },
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "medium-confidence-bot-signals"
+  }
+}

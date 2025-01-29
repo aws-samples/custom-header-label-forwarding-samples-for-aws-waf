@@ -1,0 +1,57 @@
+{
+  "Name": "high-confidence-bot-signals",
+  "Priority": 10,
+  "Statement": {
+    "OrStatement": {
+      "Statements": [
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:maximum"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:coordinated_activity:high"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:ip:high"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:asn:high"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:country:high"
+          }
+        }
+      ]
+    }
+  },
+  "Action": {
+    "Count": {
+      "CustomRequestHandling": {
+        "InsertHeaders": [
+          {
+            "Name": "bot-confidence",
+            "Value": "high"
+          }
+        ]
+      }
+    }
+  },
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "high-confidence-bot-signals"
+  }
+}

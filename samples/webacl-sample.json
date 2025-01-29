@@ -1,0 +1,601 @@
+{
+  "Name": "custom-header-label-forwarding-samples-for-aws-waf",
+  "Id": "<unique_id>",
+  "ARN": "arn:aws:wafv2:us-east-1:<account_id:global/webacl/custom-header-label-forwarding-samples-for-aws-waf/<unique_id>",
+  "DefaultAction": {
+    "Allow": {
+      "CustomRequestHandling": {
+        "InsertHeaders": [
+          {
+            "Name": "default-rule",
+            "Value": "allowed"
+          }
+        ]
+      }
+    }
+  },
+  "Description": "custom-header-label-forwarding-samples-for-aws-waf",
+  "Rules": [
+    {
+      "Name": "allowed-List",
+      "Priority": 0,
+      "Statement": {
+        "IPSetReferenceStatement": {
+          "ARN": "arn:aws:wafv2:us-east-1:<account_i>:global/ipset/Allowed-IP-Set/<unique_id>"
+        }
+      },
+      "Action": {
+        "Allow": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "Allow-List"
+      }
+    },
+    {
+      "Name": "blocked-List",
+      "Priority": 1,
+      "Statement": {
+        "IPSetReferenceStatement": {
+          "ARN": "arn:aws:wafv2:us-east-1:<account_id>:global/ipset/Blocked-IP-Set/<unique_id>"
+        }
+      },
+      "Action": {
+        "Block": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "Blocked-List"
+      }
+    },
+    {
+      "Name": "blancket-rate-limiting",
+      "Priority": 2,
+      "Statement": {
+        "RateBasedStatement": {
+          "Limit": 10000,
+          "EvaluationWindowSec": 300,
+          "AggregateKeyType": "CONSTANT",
+          "ScopeDownStatement": {
+            "ByteMatchStatement": {
+              "SearchString": "index.html",
+              "FieldToMatch": {
+                "UriPath": {}
+              },
+              "TextTransformations": [
+                {
+                  "Priority": 0,
+                  "Type": "LOWERCASE"
+                }
+              ],
+              "PositionalConstraint": "EXACTLY"
+            }
+          }
+        }
+      },
+      "Action": {
+        "Block": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "Blacket-Rate-Limiting"
+      }
+    },
+    {
+      "Name": "AWS-AWSManagedRulesAmazonIpReputationList",
+      "Priority": 3,
+      "Statement": {
+        "ManagedRuleGroupStatement": {
+          "VendorName": "AWS",
+          "Name": "AWSManagedRulesAmazonIpReputationList"
+        }
+      },
+      "OverrideAction": {
+        "None": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "AWS-AWSManagedRulesAmazonIpReputationList"
+      }
+    },
+    {
+      "Name": "AWS-AWSManagedRulesAnonymousIpList",
+      "Priority": 4,
+      "Statement": {
+        "ManagedRuleGroupStatement": {
+          "VendorName": "AWS",
+          "Name": "AWSManagedRulesAnonymousIpList"
+        }
+      },
+      "OverrideAction": {
+        "None": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "AWS-AWSManagedRulesAnonymousIpList"
+      }
+    },
+    {
+      "Name": "AWS-AWSManagedRulesCommonRuleSet",
+      "Priority": 5,
+      "Statement": {
+        "ManagedRuleGroupStatement": {
+          "VendorName": "AWS",
+          "Name": "AWSManagedRulesCommonRuleSet"
+        }
+      },
+      "OverrideAction": {
+        "None": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "AWS-AWSManagedRulesCommonRuleSet"
+      }
+    },
+    {
+      "Name": "any-custom-rule",
+      "Priority": 6,
+      "Statement": {
+        "ByteMatchStatement": {
+          "SearchString": "custom",
+          "FieldToMatch": {
+            "SingleHeader": {
+              "Name": "custom"
+            }
+          },
+          "TextTransformations": [
+            {
+              "Priority": 0,
+              "Type": "NONE"
+            }
+          ],
+          "PositionalConstraint": "EXACTLY"
+        }
+      },
+      "Action": {
+        "Block": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "any-custom-rule"
+      }
+    },
+    {
+      "Name": "AWS-AWSManagedRulesBotControlRuleSet",
+      "Priority": 7,
+      "Statement": {
+        "ManagedRuleGroupStatement": {
+          "VendorName": "AWS",
+          "Name": "AWSManagedRulesBotControlRuleSet",
+          "Version": "Version_3.1",
+          "ScopeDownStatement": {
+            "ByteMatchStatement": {
+              "SearchString": "/protectedresource.html",
+              "FieldToMatch": {
+                "UriPath": {}
+              },
+              "TextTransformations": [
+                {
+                  "Priority": 0,
+                  "Type": "LOWERCASE"
+                }
+              ],
+              "PositionalConstraint": "EXACTLY"
+            }
+          },
+          "ManagedRuleGroupConfigs": [
+            {
+              "AWSManagedRulesBotControlRuleSet": {
+                "InspectionLevel": "TARGETED",
+                "EnableMachineLearning": true
+              }
+            }
+          ],
+          "RuleActionOverrides": [
+            {
+              "Name": "TGT_TokenAbsent",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_VolumetricSession",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_VolumetricSessionMaximum",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_SignalAutomatedBrowser",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_SignalBrowserAutomationExtension",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_TokenReuseAsnHigh",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_TokenReuseAsnMedium",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_TokenReuseAsnLow",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_TokenReuseCountryHigh",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_TokenReuseCountryMedium",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_TokenReuseCountryLow",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_TokenReuseIpHigh",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_TokenReuseIpMedium",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_TokenReuseIpLow",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_ML_CoordinatedActivityHigh",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_ML_CoordinatedActivityMedium",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_ML_CoordinatedActivityLow",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            },
+            {
+              "Name": "TGT_SignalBrowserInconsistency",
+              "ActionToUse": {
+                "Challenge": {}
+              }
+            }
+          ]
+        }
+      },
+      "OverrideAction": {
+        "None": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "AWS-AWSManagedRulesBotControlRuleSet"
+      }
+    },
+    {
+      "Name": "low-confidence-bot-signals",
+      "Priority": 8,
+      "Statement": {
+        "OrStatement": {
+          "Statements": [
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:coordinated_activity:low"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:ip:low"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:country:low"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:asn:low"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:low"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:medium"
+              }
+            }
+          ]
+        }
+      },
+      "Action": {
+        "Count": {
+          "CustomRequestHandling": {
+            "InsertHeaders": [
+              {
+                "Name": "bot-confidence",
+                "Value": "low"
+              }
+            ]
+          }
+        }
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "low-confidence-bot-signals"
+      }
+    },
+    {
+      "Name": "medium-confidence-bot-signals",
+      "Priority": 9,
+      "Statement": {
+        "OrStatement": {
+          "Statements": [
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:coordinated_activity:medium"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:ip:medium"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:country:medium"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:asn:medium"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:high"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:signal:automated_browser"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:signal:browser_automation_extension"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:awswaf:managed:aws:bot-control:targeted:signal:browser_inconsistency"
+              }
+            }
+          ]
+        }
+      },
+      "Action": {
+        "Count": {
+          "CustomRequestHandling": {
+            "InsertHeaders": [
+              {
+                "Name": "bot-confidence",
+                "Value": "medium"
+              }
+            ]
+          }
+        }
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "medium-confidence-bot-signals"
+      }
+    },
+    {
+      "Name": "high-confidence-bot-signals",
+      "Priority": 10,
+      "Statement": {
+        "OrStatement": {
+          "Statements": [
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:maximum"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:coordinated_activity:high"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:ip:high"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:asn:high"
+              }
+            },
+            {
+              "LabelMatchStatement": {
+                "Scope": "LABEL",
+                "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:country:high"
+              }
+            }
+          ]
+        }
+      },
+      "Action": {
+        "Count": {
+          "CustomRequestHandling": {
+            "InsertHeaders": [
+              {
+                "Name": "bot-confidence",
+                "Value": "high"
+              }
+            ]
+          }
+        }
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "high-confidence-bot-signals"
+      }
+    },
+    {
+      "Name": "rate-limit-exceeded",
+      "Priority": 11,
+      "Statement": {
+        "RateBasedStatement": {
+          "Limit": 10,
+          "EvaluationWindowSec": 60,
+          "AggregateKeyType": "CUSTOM_KEYS",
+          "CustomKeys": [
+            {
+              "Header": {
+                "Name": "Authorization",
+                "TextTransformations": [
+                  {
+                    "Priority": 0,
+                    "Type": "NONE"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "Action": {
+        "Count": {
+          "CustomRequestHandling": {
+            "InsertHeaders": [
+              {
+                "Name": "rate-exceeded",
+                "Value": "10"
+              }
+            ]
+          }
+        }
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "rate-limit-exceeded"
+      }
+    },
+    {
+      "Name": "additional-custom-rules-if-needed-for-your-use-case",
+      "Priority": 12,
+      "Statement": {
+        "NotStatement": {
+          "Statement": {
+            "GeoMatchStatement": {
+              "CountryCodes": [
+                "US"
+              ]
+            }
+          }
+        }
+      },
+      "Action": {
+        "Block": {}
+      },
+      "VisibilityConfig": {
+        "SampledRequestsEnabled": true,
+        "CloudWatchMetricsEnabled": true,
+        "MetricName": "additional-custom-rules-if-needed-for-your-use-case"
+      }
+    }
+  ],
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "custom-header-label-forwarding-samples-for-aws-waf"
+  },
+  "Capacity": 897,
+  "ManagedByFirewallManager": false,
+  "LabelNamespace": "awswaf:<account_id>:webacl:custom-header-label-forwarding-samples-for-aws-waf:",
+  "AssociationConfig": {
+    "RequestBody": {
+      "CLOUDFRONT": {
+        "DefaultSizeInspectionLimit": "KB_64"
+      }
+    }
+  },
+  "RetrofittedByFirewallManager": false,
+  "DDOSProtectionConfig": {
+    "ALBLowReputationSources": "REACTIVE"
+  }
+}

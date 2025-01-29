@@ -1,0 +1,63 @@
+{
+  "Name": "low-confidence-bot-signals",
+  "Priority": 8,
+  "Statement": {
+    "OrStatement": {
+      "Statements": [
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:coordinated_activity:low"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:ip:low"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:country:low"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:token_reuse:asn:low"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:low"
+          }
+        },
+        {
+          "LabelMatchStatement": {
+            "Scope": "LABEL",
+            "Key": "awswaf:managed:aws:bot-control:targeted:aggregate:volumetric:session:medium"
+          }
+        }
+      ]
+    }
+  },
+  "Action": {
+    "Count": {
+      "CustomRequestHandling": {
+        "InsertHeaders": [
+          {
+            "Name": "bot-confidence",
+            "Value": "low"
+          }
+        ]
+      }
+    }
+  },
+  "VisibilityConfig": {
+    "SampledRequestsEnabled": true,
+    "CloudWatchMetricsEnabled": true,
+    "MetricName": "low-confidence-bot-signals"
+  }
+}
